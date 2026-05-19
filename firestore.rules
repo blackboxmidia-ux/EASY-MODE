@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Phase 3: Primitive Definition
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // User rules
+    function isValidUser(data) {
+      return data.userId == request.auth.uid &&
+             data.email is string && data.email.size() < 256 &&
+             data.keys().hasAll(['userId', 'email']) &&
+             data.keys().size() <= 7;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      allow update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'isPremium']);
+
+      // Subcollection for saved prompts
+      function isValidSavedPrompt(data) {
+        return data.userId == request.auth.uid &&
+               data.promptId is string && data.promptId.size() < 128 &&
+               data.keys().hasAll(['userId', 'promptId']) &&
+               data.keys().size() <= 6;
+      }
+
+      match /saved_prompts/{promptId} {
+        allow list, get: if isSignedIn() && request.auth.uid == userId;
+        allow create: if isSignedIn() && request.auth.uid == userId && isValidSavedPrompt(incoming());
+        allow delete: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+  }
+}

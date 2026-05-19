@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Montserrat:ital,wght@0,700;0,900;1,700;1,900&family=Space+Grotesk:wght@300;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat", sans-serif;
+  --color-neon-blue: #00FFFF;
+  --color-cyber-black: #030303;
+  --color-glass: rgba(255, 255, 255, 0.03);
+  --color-glass-border: rgba(0, 240, 255, 0.1);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-cyber-black);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.bg-grid {
+  background-image: linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-grid-large {
+  background-image: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 160px 160px;
+}
+
+.cyber-mask {
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+}
+
+.hologram-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.hologram-effect::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 240, 255, 0.03),
+    rgba(0, 240, 255, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+
+.scanline {
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 240, 255, 0.1);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  pointer-events: none;
+  animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glow-blue {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1.5px #00F0FF;
+  color: transparent;
+}
+
+.skew-btn {
+  transform: skewX(-12deg);
+}
+
+.skew-btn > * {
+  transform: skewX(12deg);
+}
