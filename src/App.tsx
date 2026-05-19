@@ -166,13 +166,13 @@ const CyberBackground = () => (
         repeat: Infinity,
         ease: "linear",
       }}
-      className="absolute top-0 bottom-0 w-[2px] bg-neon-blue shadow-[0_0_20px_#00F0FF] blur-[1px]"
+      className="absolute top-0 bottom-0 w-[1px] bg-neon-blue shadow-[0_0_15px_#00F0FF] blur-[0.5px]"
     />
     {/* Moving Beam Vertical */}
     <motion.div
       animate={{
         y: ["-100%", "200%"],
-        opacity: [0, 0.2, 0]
+        opacity: [0, 0.15, 0]
       }}
       transition={{
         duration: 15,
@@ -180,7 +180,7 @@ const CyberBackground = () => (
         ease: "linear",
         delay: 5
       }}
-      className="absolute left-0 right-0 h-[1px] bg-neon-blue/50 shadow-[0_0_15px_#00F0FF] blur-[1px]"
+      className="absolute left-0 right-0 h-[0.5px] bg-neon-blue/40 shadow-[0_0_10px_#00F0FF] blur-[0.5px]"
     />
     
     {/* Neon Particles */}
@@ -271,7 +271,7 @@ const LoadingScreen = ({ onComplete, lang }: { onComplete: () => void; lang: Lan
         exit={{ opacity: 0, scale: 1.1 }}
         className="relative"
       >
-        <div className="w-24 h-24 border-t-2 border-r-2 border-neon-blue rounded-full animate-spin glow-blue" />
+        <div className="w-24 h-24 border-t-2 border-r-2 border-neon-blue rounded-full animate-spin shadow-neon" />
         <div className="absolute inset-0 flex items-center justify-center">
           <Zap className="w-8 h-8 text-neon-blue animate-pulse" />
         </div>
@@ -363,16 +363,16 @@ const PromptCard: React.FC<PromptCardProps> = ({ prompt, lang }) => {
       whileHover={{ 
         y: -6, 
         scale: 1.01,
-        boxShadow: "0 12px 25px -12px rgba(0, 240, 255, 0.25)"
+        boxShadow: "0 20px 40px -15px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 240, 255, 0.1)"
       }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="glass-card-premium p-6 border-white/5 hover:border-neon-blue/30 transition-colors group flex flex-col h-full hologram-effect cursor-pointer relative overflow-hidden"
+      className="glass-card-premium p-6 border-white/5 hover:border-neon-blue/30 transition-all group flex flex-col h-full hologram-effect cursor-pointer relative overflow-hidden"
     >
       <div className="absolute top-0 right-0 w-24 h-24 bg-neon-blue/5 blur-[40px] pointer-events-none group-hover:bg-neon-blue/20 transition-all" />
       
       <div className="flex justify-between items-start mb-6 relative z-10">
-        <div className="p-2.5 bg-white/5 rounded-xl text-neon-blue border border-white/5 shadow-[0_0_15px_rgba(0,240,255,0.1)]">
-          <Cpu className="w-5 h-5 shadow-neon-blue" />
+        <div className="p-2.5 bg-white/5 rounded-xl text-neon-blue border border-white/5 shadow-neon">
+          <Cpu className="w-5 h-5" />
         </div>
         <div className="flex items-center gap-3">
           {user && (
@@ -492,7 +492,7 @@ export default function App() {
       <CyberBackground />
       
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 w-full z-50 px-6 sm:px-12 py-6 flex justify-between items-center bg-black/40 backdrop-blur-md border-b border-white/10">
+      <nav className="fixed top-0 left-0 w-full z-50 px-6 sm:px-12 py-6 flex justify-between items-center bg-black/60 backdrop-blur-xl border-b border-white/5">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 bg-neon-blue rounded-full shadow-[0_0_10px_#00F0FF] animate-pulse"></div>
           <span className="text-xl font-black italic tracking-tighter uppercase">EASY MODE<span className="text-neon-blue font-normal uppercase text-[9px] align-top ml-0.5 tracking-normal">™</span></span>
@@ -521,13 +521,15 @@ export default function App() {
               </div>
             </div>
           ) : (
-            <button 
-              onClick={login}
+            <a 
+              href="https://dashboard.kiwify.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 border border-white/10 bg-white/5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
             >
               <LogIn className="w-3 h-3" />
               <span>{t.nav.login}</span>
-            </button>
+            </a>
           )}
 
           <motion.a 
@@ -536,7 +538,7 @@ export default function App() {
             rel="noopener noreferrer"
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
-            className="flex px-4 sm:px-6 py-2 sm:py-2.5 border border-neon-blue bg-neon-blue/20 text-neon-blue rounded-full text-[9px] sm:text-[11px] font-black uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] whitespace-nowrap"
+            className="flex px-4 sm:px-6 py-2 sm:py-2.5 border border-neon-blue/30 bg-neon-blue/10 text-neon-blue rounded-full text-[9px] sm:text-[11px] font-black uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] whitespace-nowrap"
           >
             {t.nav.cta}
           </motion.a>
@@ -599,7 +601,7 @@ export default function App() {
                   href="https://kiwify.app/8FU8vze"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="skew-btn px-16 py-6 bg-neon-blue text-black font-black uppercase text-sm sm:text-base hover:scale-105 transition-all text-center group glow-pulse shadow-[0_0_30px_rgba(0,255,255,0.4)]"
+                  className="skew-btn px-16 py-6 bg-neon-blue text-black font-black uppercase text-sm sm:text-base hover:scale-105 hover:shadow-neon-lg transition-all text-center group glow-pulse shadow-neon"
                 >
                   <span className="block italic flex items-center justify-center gap-3">
                     {t.hero.cta} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -677,7 +679,7 @@ export default function App() {
               whileInView={{ opacity: 1 }}
               className="mt-20 flex flex-col items-center"
             >
-              <div className="h-24 w-[1px] bg-gradient-to-b from-white/0 via-red-500/50 to-neon-blue shadow-[0_0_15px_#00FFFF]" />
+              <div className="h-24 w-[1px] bg-gradient-to-b from-white/0 via-red-500/50 to-neon-blue shadow-neon" />
               <div className="mt-8 px-6 py-2 bg-neon-blue text-black font-black uppercase text-[10px] tracking-[0.3em] glow-blue">
                 {t.pain.transition}
               </div>
@@ -874,7 +876,7 @@ export default function App() {
                   </li>
                 </ul>
                 <a 
-                  href="https://kiwify.app/8FU8vze"
+                  href="https://pay.kiwify.com.br/8BMBv80"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full block py-5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black uppercase text-xs tracking-[0.3em] text-center transition-all"
@@ -888,10 +890,10 @@ export default function App() {
                 whileHover={{ 
                   y: -10,
                   scale: 1.02,
-                  boxShadow: "0 25px 50px -12px rgba(0, 240, 255, 0.25)"
+                  boxShadow: "0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 240, 255, 0.2)"
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="glass-card p-12 border-neon-blue/30 relative overflow-hidden group bg-neon-blue/[0.02]"
+                className="glass-card-premium p-12 border-neon-blue/30 relative overflow-hidden group bg-neon-blue/[0.01]"
               >
                 <div className="absolute -top-4 -right-4 px-6 py-2 bg-neon-blue text-black font-black uppercase text-[9px] tracking-widest skew-x-[-12deg] z-20">
                   <span className="block skew-x-[12deg]">{(t as any).common.viral}</span>
@@ -921,7 +923,7 @@ export default function App() {
                   </li>
                 </ul>
                 <a 
-                  href="https://kiwify.app/8FU8vze"
+                  href="https://pay.kiwify.com.br/MojAOEP"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full skew-btn block py-5 bg-neon-blue text-black font-black uppercase text-xs tracking-[0.3em] text-center transition-all shadow-[0_0_30px_rgba(0,240,255,0.2)]"
