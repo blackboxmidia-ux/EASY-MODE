@@ -254,7 +254,7 @@ const LanguageSwitcher = ({ current, onChange }: { current: Language, onChange: 
   );
 };
 
-const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
+const LoadingScreen = ({ onComplete, lang }: { onComplete: () => void; lang: Language }) => {
   useEffect(() => {
     const timer = setTimeout(onComplete, 1500);
     return () => clearTimeout(timer);
@@ -283,7 +283,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
         className="mt-8 text-center"
       >
         <h2 className="text-xl font-display font-black italic uppercase italic tracking-[0.4em] glow-text">EASY MODE<span className="text-neon-blue">™</span></h2>
-        <p className="text-[10px] text-white/30 uppercase tracking-[0.5em] mt-2 font-mono">System Initialization...</p>
+        <p className="text-[10px] text-white/30 uppercase tracking-[0.5em] mt-2 font-mono">{(translations[lang] as any).common.loading}</p>
       </motion.div>
       
       <div className="absolute bottom-12 w-full max-w-xs h-[1px] bg-white/10 overflow-hidden">
@@ -366,48 +366,100 @@ const PromptCard: React.FC<PromptCardProps> = ({ prompt, lang }) => {
         boxShadow: "0 12px 25px -12px rgba(0, 240, 255, 0.25)"
       }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="glass-card p-6 border-white/5 hover:border-neon-blue/30 transition-colors group flex flex-col h-full hologram-effect cursor-pointer"
+      className="glass-card-premium p-6 border-white/5 hover:border-neon-blue/30 transition-colors group flex flex-col h-full hologram-effect cursor-pointer relative overflow-hidden"
     >
-      <div className="flex justify-between items-start mb-4">
-        <div className="p-2 bg-white/5 rounded-lg text-neon-blue">
-          <Cpu className="w-5 h-5" />
+      <div className="absolute top-0 right-0 w-24 h-24 bg-neon-blue/5 blur-[40px] pointer-events-none group-hover:bg-neon-blue/20 transition-all" />
+      
+      <div className="flex justify-between items-start mb-6 relative z-10">
+        <div className="p-2.5 bg-white/5 rounded-xl text-neon-blue border border-white/5 shadow-[0_0_15px_rgba(0,240,255,0.1)]">
+          <Cpu className="w-5 h-5 shadow-neon-blue" />
         </div>
         <div className="flex items-center gap-3">
           {user && (
             <button 
               onClick={toggleSave}
-              className={`transition-colors ${isSaved ? 'text-neon-blue' : 'text-white/20 hover:text-white'}`}
+              className={`transition-colors p-1.5 rounded-lg hover:bg-white/5 ${isSaved ? 'text-neon-blue' : 'text-white/20 hover:text-white'}`}
             >
-              {isSaved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+              {isSaved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
             </button>
           )}
-          <span className="text-[10px] font-bold uppercase tracking-widest text-white/20">{prompt.category}</span>
+          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20 bg-white/5 px-2 py-1 rounded border border-white/5">{prompt.category}</span>
         </div>
       </div>
       
-      <h3 className="text-lg font-display font-bold mb-2 group-hover:text-neon-blue transition-colors">
-        {prompt.title[lang]}
-      </h3>
-      <p className="text-sm text-white/40 mb-6 flex-1 leading-relaxed">
-        {prompt.description[lang]}
-      </p>
+      <div className="flex-1 relative z-10">
+        <h3 className="text-xl font-black uppercase italic tracking-tighter mb-3 group-hover:text-neon-blue transition-colors">
+          {prompt.title[lang]}
+        </h3>
+        <p className="text-sm text-white/40 mb-8 leading-relaxed font-medium">
+          {prompt.description[lang]}
+        </p>
+      </div>
       
       <button 
         onClick={handleCopy}
         onMouseEnter={() => setIsButtonHovered(true)}
         onMouseLeave={() => setIsButtonHovered(false)}
-        className={`w-full py-3 rounded flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest transition-all ${
-          copied ? 'bg-neon-blue text-black' : 'bg-white/5 hover:bg-neon-blue/20 text-white'
+        className={`w-full py-4 rounded-xl flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all relative z-10 ${
+          copied ? 'bg-neon-blue text-black shadow-[0_0_20px_#00FFFF]' : 'bg-white/5 hover:bg-neon-blue/10 text-white border border-white/5 hover:border-neon-blue/30'
         }`}
       >
-        {copied ? (
-          <Check className="w-4 h-4" />
-        ) : (
-          isButtonHovered ? <Zap className="w-4 h-4 text-neon-blue fill-neon-blue" /> : <Lock className="w-4 h-4" />
-        )}
-        {copied ? t.copied : t.copy}
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            {copied ? (
+              <motion.div
+                key="check"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+              >
+                <Check className="w-4 h-4" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="icon"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+              >
+                {isButtonHovered ? <Zap className="w-4 h-4 text-neon-blue fill-neon-blue" /> : <Lock className="w-4 h-4 text-white/40" />}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <span>{copied ? t.copied : t.copy}</span>
       </button>
+
+      {/* Aesthetic Scanline for card */}
+      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-neon-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
     </motion.div>
+  );
+};
+
+const RotatingHeadline = ({ headlines }: { headlines: string[] }) => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % headlines.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [headlines]);
+
+  return (
+    <div className="h-[1.5em] sm:h-[1.2em] relative overflow-hidden flex justify-center">
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={`${headlines[index]}-${index}`}
+          initial={{ y: 60, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -60, opacity: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute text-center w-full px-4"
+        >
+          {headlines[index]}
+        </motion.span>
+      </AnimatePresence>
+    </div>
   );
 };
 
@@ -432,7 +484,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-black text-white relative selection:bg-neon-blue selection:text-black font-sans">
       <AnimatePresence>
-        {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
+        {isLoading && <LoadingScreen lang={lang} onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
 
       {/* Grid Background */}
@@ -449,7 +501,7 @@ export default function App() {
         <div className="flex items-center gap-4 sm:gap-8">
           <div className="hidden lg:flex items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-medium text-white/30">
             <a href="#hub" className="hover:text-neon-blue transition-colors font-bold">{t.nav.assets}</a>
-            <a href="#premium" className="hover:text-neon-blue transition-colors font-bold">Premium</a>
+            <a href="#premium" className="hover:text-neon-blue transition-colors font-bold">{t.nav.premium}</a>
           </div>
           
           <LanguageSwitcher current={lang} onChange={setLang} />
@@ -458,7 +510,7 @@ export default function App() {
             <div className="flex items-center gap-4">
               <div className="hidden sm:flex flex-col items-end">
                 <span className="text-[10px] font-black uppercase text-neon-blue tracking-widest">{user.displayName}</span>
-                <button onClick={logout} className="text-[8px] uppercase text-white/40 hover:text-white transition-colors tracking-[0.2em]">Logout</button>
+                <button onClick={logout} className="text-[8px] uppercase text-white/40 hover:text-white transition-colors tracking-[0.2em]">{t.nav.logout}</button>
               </div>
               <div className="w-8 h-8 rounded-full border border-neon-blue/40 overflow-hidden bg-white/5 flex items-center justify-center">
                 {user.photoURL ? (
@@ -474,12 +526,14 @@ export default function App() {
               className="flex items-center gap-2 px-4 py-2 border border-white/10 bg-white/5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
             >
               <LogIn className="w-3 h-3" />
-              <span>Login</span>
+              <span>{t.nav.login}</span>
             </button>
           )}
 
           <motion.a 
-            href="#premium"
+            href="https://kiwify.app/8FU8vze"
+            target="_blank"
+            rel="noopener noreferrer"
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ repeat: Infinity, duration: 2 }}
             className="flex px-4 sm:px-6 py-2 sm:py-2.5 border border-neon-blue bg-neon-blue/20 text-neon-blue rounded-full text-[9px] sm:text-[11px] font-black uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.3)] hover:shadow-[0_0_30px_rgba(0,255,255,0.5)] whitespace-nowrap"
@@ -492,7 +546,7 @@ export default function App() {
       {/* Custom HUD Elements (Desktop) */}
       <div className="hidden xl:block fixed left-12 top-1/2 -translate-y-1/2 z-20 space-y-12">
         <div className="flex flex-col gap-2 font-mono text-[9px] text-white/20 uppercase tracking-[0.3em] rotate-[-90deg]">
-          <span>Advantage established</span>
+          <span>{(t as any).common.hud}</span>
           <div className="h-[1px] w-24 bg-white/10" />
         </div>
       </div>
@@ -522,11 +576,7 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               className="text-5xl sm:text-7xl lg:text-9xl font-black italic tracking-tighter leading-[0.95] sm:leading-[0.85] uppercase mb-10 max-w-5xl"
             >
-              {t.hero.headline.split(' ').map((word, i) => (
-                <span key={i} className={word.toLowerCase() === 'ia' || word.toLowerCase() === 'ai' ? "text-stroke border-b-2 sm:border-b-4 border-neon-blue pb-2" : ""}>
-                   {word}{' '}
-                </span>
-              ))}
+              <RotatingHeadline headlines={t.hero.headlines} />
             </motion.h1>
 
             <motion.p 
@@ -542,16 +592,22 @@ export default function App() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-6 w-full max-w-md sm:max-w-none justify-center px-4"
+              className="flex flex-col items-center gap-8 w-full max-w-md sm:max-w-none px-4"
             >
-              <a 
-                href="#premium"
-                className="skew-btn px-12 py-5 bg-white text-black font-black uppercase text-sm hover:bg-neon-blue transition-colors text-center group"
-              >
-                <span className="block italic flex items-center justify-center gap-3">
-                  {t.hero.cta} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </a>
+              <div className="flex flex-col items-center gap-3">
+                <a 
+                  href="https://kiwify.app/8FU8vze"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="skew-btn px-16 py-6 bg-neon-blue text-black font-black uppercase text-sm sm:text-base hover:scale-105 transition-all text-center group glow-pulse shadow-[0_0_30px_rgba(0,255,255,0.4)]"
+                >
+                  <span className="block italic flex items-center justify-center gap-3">
+                    {t.hero.cta} <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </a>
+                <span className="text-[10px] text-white/30 uppercase tracking-[0.4em] font-black">{t.hero.subtext}</span>
+              </div>
+
               <a 
                 href="#hub"
                 className="px-10 py-5 bg-white/5 border border-white/10 rounded-none text-[10px] font-black uppercase tracking-[0.3em] hover:bg-white/10 transition-all flex items-center justify-center gap-2"
@@ -573,8 +629,8 @@ export default function App() {
                   <TrendingUp className="text-neon-blue w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-[9px] uppercase font-bold text-white/30 tracking-widest">Active Data</div>
-                  <div className="text-sm font-black italic">OPTIMIZING...</div>
+                  <div className="text-[9px] uppercase font-bold text-white/30 tracking-widest">{(t as any).common.activeData}</div>
+                  <div className="text-sm font-black italic">{(t as any).common.optimizing}</div>
                 </div>
               </div>
               <div className="space-y-2">
@@ -587,6 +643,46 @@ export default function App() {
               </div>
             </div>
           </motion.div>
+        </section>
+
+        {/* Pain Points Section */}
+        <section className="py-24 px-6 relative overflow-hidden">
+          <div className="container max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-5xl font-black italic uppercase tracking-tighter mb-4">{t.pain.title}</h2>
+              <p className="text-white/40 uppercase tracking-[0.2em] text-[10px] sm:text-xs">{t.pain.subtitle}</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {t.pain.items.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="glass-card-premium p-8 border-white/5 hover:border-red-500/20 transition-all group"
+                >
+                  <div className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center mb-6 text-white/20 group-hover:text-red-500 group-hover:bg-red-500/10 transition-all">
+                    <X className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-black uppercase mb-2 tracking-tight group-hover:text-red-500 transition-colors">{item.title}</h3>
+                  <p className="text-sm text-white/40 leading-relaxed">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              className="mt-20 flex flex-col items-center"
+            >
+              <div className="h-24 w-[1px] bg-gradient-to-b from-white/0 via-red-500/50 to-neon-blue shadow-[0_0_15px_#00FFFF]" />
+              <div className="mt-8 px-6 py-2 bg-neon-blue text-black font-black uppercase text-[10px] tracking-[0.3em] glow-blue">
+                {t.pain.transition}
+              </div>
+            </motion.div>
+          </div>
         </section>
 
         {/* Prompt Library Hub */}
@@ -659,6 +755,77 @@ export default function App() {
           </div>
         </section>
 
+        {/* Digital Advantage Section */}
+        <section className="py-32 px-6 relative overflow-hidden bg-white/[0.01]">
+          <div className="container max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+            <div className="flex-1">
+              <motion.div 
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <div className="text-neon-blue text-[10px] uppercase font-black tracking-[0.5em] mb-6">{(t as any).advantage.badge}</div>
+                <h2 className="text-4xl sm:text-7xl font-black italic uppercase tracking-tighter leading-none mb-8">
+                  {(t as any).advantage.title.split(' ').map((word: string, i: number) => (
+                    <span key={i} className={word.toLowerCase() === 'internet' ? "text-stroke" : ""}>
+                      {word}{' '}
+                    </span>
+                  ))}
+                </h2>
+                <p className="text-lg text-white/50 leading-relaxed max-w-xl mb-10">
+                  {(t as any).advantage.subtitle}
+                </p>
+                <div className="grid grid-cols-2 gap-8">
+                  <div>
+                    <div className="text-3xl font-black text-neon-blue mb-1">{(t as any).advantage.stat1}</div>
+                    <div className="text-[10px] uppercase font-bold text-white/30 tracking-widest">{(t as any).advantage.stat1Desc}</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-black text-neon-blue mb-1">{(t as any).advantage.stat2}</div>
+                    <div className="text-[10px] uppercase font-bold text-white/30 tracking-widest">{(t as any).advantage.stat2Desc}</div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+            
+            <div className="flex-1 w-full lg:w-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="glass-card-premium p-4 sm:p-8 relative group"
+              >
+                <div className="absolute inset-0 bg-neon-blue/5 blur-[100px] pointer-events-none" />
+                <div className="flex items-center gap-4 mb-6 border-b border-white/5 pb-4">
+                  <div className="w-12 h-12 bg-neon-blue/20 rounded-xl flex items-center justify-center text-neon-blue animate-pulse">
+                    <Smartphone className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="text-[9px] uppercase font-black text-white/30">{(t as any).advantage.status}</div>
+                    <div className="text-xs font-black italic">{(t as any).advantage.optimization}</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  {[1, 2, 3].map((_, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-xl">
+                      <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-full bg-neon-blue/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-neon-blue" />
+                        </div>
+                        <div className="h-2 w-24 bg-white/10 rounded-full overflow-hidden">
+                           <motion.div animate={{ scaleX: [0, 1] }} transition={{ duration: 1, delay: i * 0.2 }} className="h-full bg-neon-blue origin-left" />
+                        </div>
+                      </div>
+                      <div className="text-[10px] font-bold text-neon-blue">{(t as any).advantage.active}</div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
         {/* Premium Products */}
         <section id="premium" className="py-32 px-6 relative overflow-hidden bg-black">
           <div className="absolute inset-0 bg-grid opacity-10 pointer-events-none" />
@@ -693,7 +860,7 @@ export default function App() {
                   <h3 className="text-3xl font-black italic uppercase mb-2">EASY FIX™</h3>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-display font-black text-neon-blue">{t.products.pricePrefix}{lang === 'pt' ? '10' : '9' }</span>
-                    <span className="text-[10px] text-white/30 uppercase font-black uppercase italic">One-Time Activation</span>
+                    <span className="text-[10px] text-white/30 uppercase font-black uppercase italic">{(t as any).common.activation}</span>
                   </div>
                 </div>
                 <ul className="space-y-4 mb-12 text-white/50 text-xs font-bold uppercase tracking-widest">
@@ -707,7 +874,7 @@ export default function App() {
                   </li>
                 </ul>
                 <a 
-                  href="https://pay.kiwify.com.br/YOUR_EASY_FIX_ID"
+                  href="https://kiwify.app/8FU8vze"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full block py-5 bg-white/5 border border-white/10 hover:bg-white/10 text-white font-black uppercase text-xs tracking-[0.3em] text-center transition-all"
@@ -727,7 +894,7 @@ export default function App() {
                 className="glass-card p-12 border-neon-blue/30 relative overflow-hidden group bg-neon-blue/[0.02]"
               >
                 <div className="absolute -top-4 -right-4 px-6 py-2 bg-neon-blue text-black font-black uppercase text-[9px] tracking-widest skew-x-[-12deg] z-20">
-                  <span className="block skew-x-[12deg]">Most Viral</span>
+                  <span className="block skew-x-[12deg]">{(t as any).common.viral}</span>
                 </div>
                 <div className="absolute top-0 right-0 p-6 opacity-20 group-hover:opacity-50 transition-opacity">
                   <Rocket className="w-32 h-32 text-neon-blue rotate-12" />
@@ -736,7 +903,7 @@ export default function App() {
                   <h3 className="text-3xl font-black italic uppercase mb-2">EASY MODE™</h3>
                   <div className="flex items-baseline gap-2">
                     <span className="text-5xl font-display font-black text-neon-blue glow-text">{t.products.pricePrefix}{lang === 'pt' ? '50' : '19' }</span>
-                    <span className="text-[10px] text-white/30 uppercase font-black uppercase italic">Lifetime Mastery</span>
+                    <span className="text-[10px] text-white/30 uppercase font-black uppercase italic">{(t as any).common.mastery}</span>
                   </div>
                 </div>
                 <ul className="space-y-4 mb-12 text-white/60 text-xs font-bold uppercase tracking-widest">
@@ -754,12 +921,12 @@ export default function App() {
                   </li>
                 </ul>
                 <a 
-                  href="https://pay.kiwify.com.br/YOUR_EASY_MODE_ID"
+                  href="https://kiwify.app/8FU8vze"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full skew-btn block py-5 bg-neon-blue text-black font-black uppercase text-xs tracking-[0.3em] text-center transition-all shadow-[0_0_30px_rgba(0,240,255,0.2)]"
                 >
-                   <span className="block">{t.products.cta} (PIX)</span>
+                   <span className="block">{t.products.cta} {(t as any).common.pix}</span>
                 </a>
               </motion.div>
             </div>
@@ -780,9 +947,9 @@ export default function App() {
             </div>
             
             <div className="flex items-center gap-8 opacity-20 grayscale hover:opacity-100 hover:grayscale-0 transition-all">
-               <div className="px-4 py-2 bg-white/5 border border-white/10 font-black italic italic uppercase italic text-[9px] tracking-widest uppercase">Verified</div>
-               <div className="px-4 py-2 bg-white/5 border border-white/10 font-black italic italic uppercase italic text-[9px] tracking-widest uppercase">Secured</div>
-               <div className="px-4 py-2 bg-white/5 border border-white/10 font-black italic italic uppercase italic text-[9px] tracking-widest uppercase">Optimized</div>
+               <div className="px-4 py-2 bg-white/5 border border-white/10 font-black italic uppercase text-[9px] tracking-widest uppercase">{(t as any).common.verified}</div>
+               <div className="px-4 py-2 bg-white/5 border border-white/10 font-black italic uppercase text-[9px] tracking-widest uppercase">{(t as any).common.secured}</div>
+               <div className="px-4 py-2 bg-white/5 border border-white/10 font-black italic uppercase text-[9px] tracking-widest uppercase">{(t as any).common.optimized}</div>
             </div>
           </div>
           
@@ -804,12 +971,25 @@ export default function App() {
 
       {/* Fixed Sticky CTA (Mobile) */}
       <div className="lg:hidden fixed bottom-6 left-6 right-6 z-[40]">
-        <a 
-          href="#premium"
-          className="w-full skew-btn block py-4 bg-neon-blue text-black font-black uppercase text-[10px] tracking-widest text-center shadow-[0_0_20px_rgba(0,240,255,0.3)] transition-all active:scale-95"
+        <motion.div
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          className="relative"
         >
-          <span className="block">UPGRADE TO EASY MODE™ PREMIUM</span>
-        </a>
+          <div className="absolute -inset-0.5 bg-neon-blue blur opacity-30 animate-pulse rounded-2xl" />
+          <a 
+            href="https://kiwify.app/8FU8vze"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full relative flex items-center justify-center gap-3 py-5 bg-black border-2 border-neon-blue text-neon-blue font-black uppercase text-[11px] tracking-[0.2em] rounded-2xl shadow-[0_0_30px_rgba(0,255,255,0.2)] active:scale-95 transition-all"
+          >
+            <Zap className="w-4 h-4 fill-neon-blue" />
+            <span>{t.nav.cta}</span>
+          </a>
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-neon-blue text-black text-[8px] font-black uppercase tracking-widest rounded-full">
+            {(t as any).common.limited}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
